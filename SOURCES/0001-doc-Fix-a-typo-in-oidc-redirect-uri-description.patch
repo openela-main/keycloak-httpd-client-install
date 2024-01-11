@@ -1,0 +1,25 @@
+From d4b703761cc52d25e82d8bdf7fb860ccedaa15a2 Mon Sep 17 00:00:00 2001
+From: Jakub Hrozek <jhrozek@redhat.com>
+Date: Fri, 28 Jun 2019 21:18:45 +0200
+Subject: [PATCH 1/4] doc: Fix a typo in --oidc-redirect-uri description
+
+---
+ doc/keycloak-httpd-client-install.8 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/keycloak-httpd-client-install.8 b/doc/keycloak-httpd-client-install.8
+index f67c227..734e837 100644
+--- a/doc/keycloak-httpd-client-install.8
++++ b/doc/keycloak-httpd-client-install.8
+@@ -205,7 +205,7 @@ Common root ancestor for all protected locations
+ .B mod_auth_oidc OIDC RP Client Options
+ 
+ .TP
+-.BR \-\-oidc\-redirect\--uri " " \fIOIDC_REDIRECT_URI\fR
++.BR \-\-oidc\-redirect\-uri " " \fIOIDC_REDIRECT_URI\fR
+ The OIDC redirect_uri. Must be an antecedent (i.e. child) of one of the
+ protected locations.
+ (default: The first protected location appened with "/redirect_uri")
+-- 
+2.20.1
+

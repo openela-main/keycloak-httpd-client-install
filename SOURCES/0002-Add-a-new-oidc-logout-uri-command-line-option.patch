@@ -1,0 +1,93 @@
+From 1428515ecb6297b9ccc074210aa6f466fbae30d8 Mon Sep 17 00:00:00 2001
+From: Jakub Hrozek <jhrozek@redhat.com>
+Date: Mon, 1 Jul 2019 15:33:05 +0200
+Subject: [PATCH 2/4] Add a new --oidc-logout-uri command line option
+
+This patch adds a new command line option, unset by default, which if
+set, is added as an additional redirectUri when the keycloak client is
+being created.
+
+This option might be useful to add an extra allowed redirect for logout
+pages.
+
+The mod_auth_openidc wiki:
+    https://github.com/zmartzone/mod_auth_openidc/wiki#9-how-do-i-logout-users
+says:
+   By redirecting the user to the OIDCRedirectURI with a parameter named
+   logout. The value of that parameter contains the (URL-encoded) URL where
+   the user will be redirected to after the session has been killed.
+and also:
+   make sure that the (URL-encoded) callback URL passed in the logout
+   parameter points to a location that is not protected by
+   mod_auth_openidc or else the login process will be started again.
+---
+ bin/keycloak-httpd-client-install        | 5 +++++
+ doc/keycloak-httpd-client-install.8      | 8 ++++++++
+ templates/oidc-client-registration.tpl   | 3 +++
+ templates/oidc-client-representation.tpl | 3 +++
+ 4 files changed, 19 insertions(+)
+
+diff --git a/bin/keycloak-httpd-client-install b/bin/keycloak-httpd-client-install
+index f211a4d..128f962 100755
+--- a/bin/keycloak-httpd-client-install
++++ b/bin/keycloak-httpd-client-install
+@@ -886,6 +886,11 @@ def main():
+                        help='claim used when setting the REMOTE_USER variable, '
+                        'default="sub"')
+ 
++    group.add_argument('--oidc-logout-uri',
++                       help='Should not be a child of one of the protected '
++                       'locations. When set, adds the argument as a valid '
++                       'redirectUri for Keycloak')
++
+     # ---- Argument Group "Mellon SP"  ----
+ 
+     group = parser.add_argument_group('Mellon SP')
+diff --git a/doc/keycloak-httpd-client-install.8 b/doc/keycloak-httpd-client-install.8
+index 734e837..ead8717 100644
+--- a/doc/keycloak-httpd-client-install.8
++++ b/doc/keycloak-httpd-client-install.8
+@@ -210,6 +210,14 @@ The OIDC redirect_uri. Must be an antecedent (i.e. child) of one of the
+ protected locations.
+ (default: The first protected location appened with "/redirect_uri")
+ 
++.TP
++.BR \-\-oidc\-logout\-uri " " \fIOIDC_REDIRECT_URI\fR
++Can be used to add the location the user is redirected to after logout as
++an additional redirectUri value in Keycloak's client representation. The
++location should not be nested under any of the protected locations,
++otherwise the login process would start again.
++(default: None)
++
+ .TP
+ .BR \-\-oidc\-client\-secret " " \fIOIDC_CLIENT_SECRET\fR
+ OIDC client secret
+diff --git a/templates/oidc-client-registration.tpl b/templates/oidc-client-registration.tpl
+index 3c45c09..fd6cd38 100644
+--- a/templates/oidc-client-registration.tpl
++++ b/templates/oidc-client-registration.tpl
+@@ -2,5 +2,8 @@
+     "client_name": "{{ clientid }}",
+     "redirect_uris": [
+         "{{ client_https_url }}{{ oidc_redirect_uri }}"
++        {% if oidc_logout_uri %}
++        ,"{{ client_https_url }}{{ oidc_logout_uri }}",
++        {% endif %}
+     ]
+ }
+diff --git a/templates/oidc-client-representation.tpl b/templates/oidc-client-representation.tpl
+index 2bbf66a..1f4a496 100644
+--- a/templates/oidc-client-representation.tpl
++++ b/templates/oidc-client-representation.tpl
+@@ -6,5 +6,8 @@
+     "clientAuthenticatorType": "client-secret",
+     "redirectUris": [
+         "{{ client_https_url }}{{ oidc_redirect_uri }}"
++        {% if oidc_logout_uri %}
++        ,"{{ client_https_url }}{{ oidc_logout_uri }}"
++        {% endif %}
+     ]
+ }
+-- 
+2.20.1
+
