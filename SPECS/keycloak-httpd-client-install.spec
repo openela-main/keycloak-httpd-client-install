@@ -12,15 +12,13 @@
 %endif
 
 Name:           %{srcname}
-Version:        1.1
-Release:        10%{?dist}
+Version:        1.3
+Release:        1%{?dist}
 Summary:        %{summary}
 
-%global git_tag RELEASE_%(r=%{version}; echo $r | tr '.' '_')
-
-License:        GPLv3
-URL:            https://github.com/jdennis/keycloak-httpd-client-install
-Source0:        https://github.com/jdennis/keycloak-httpd-client-install/archive/%{git_tag}.tar.gz
+License:        GPL-3.0-or-later
+URL:            https://github.com/latchset/keycloak-httpd-client-install
+Source0:        https://github.com/latchset/keycloak-httpd-client-install/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -79,7 +77,7 @@ of a Keycloak server.
 %endif
 
 %prep
-%autosetup -n %{srcname}-%{git_tag} -p1
+%autosetup -n %{name}-%{version} -p1
 
 %build
 %if %{with python2}
@@ -138,6 +136,10 @@ install -c -m 644 doc/keycloak-httpd-client-install.8 %{buildroot}/%{_mandir}/ma
 %endif
 
 %changelog
+* Fri Sep 20 2024 Tomas Halman <thalman@redhat.com> - 1.3-1
+- Rebase to version 1.3
+- Resolves: RHEL-3336 - khci won't work with Quarkus-based Keycloak due to missing /auth path
+
 * Mon Aug 09 2021 Mohan Boddu <mboddu@redhat.com> - 1.1-10
 - Rebuilt for IMA sigs, glibc 2.34, aarch64 flags
   Related: rhbz#1991688
